@@ -9,13 +9,41 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Email validation regex
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   async function handleLogin(e) {
     e.preventDefault();
 
     setLoading(true);
     setMessage("");
+    setErrorMessage("");
+
+    // Validate email format
+    if (!email.trim()) {
+      setErrorMessage("Email is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setErrorMessage("Please enter a valid email address");
+      setLoading(false);
+      return;
+    }
+
+    // Validate password
+    if (!password.trim()) {
+      setErrorMessage("Password is required");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -23,7 +51,7 @@ function Login() {
     });
 
     if (error) {
-      setMessage(error.message);
+      setErrorMessage(error.message);
       setLoading(false);
       return;
     }
@@ -97,8 +125,14 @@ function Login() {
 
         </form>
 
+        {errorMessage && (
+          <p className="auth-message" style={{ color: "#ff4757" }}>
+            {errorMessage}
+          </p>
+        )}
+
         {message && (
-          <p className="auth-message">
+          <p className="auth-message" style={{ color: "#2ed573" }}>
             {message}
           </p>
         )}
